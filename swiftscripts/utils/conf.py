@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 from ConfigParser import ConfigParser
-
+import sys
 
 def get_conf(section=None):
     c = ConfigParser()
