@@ -1,0 +1,94 @@
+#!/usr/bin/env python
+
+'''
+swiftscripts-memcache-check
+
+ # A quick and *very* dirty script to health check memcache
+ # server(s) and dump their stats. Requires swift.common.memcached.
+ # forked from Florian Hines's check_memcache.py
+ # Author: Florian Hines <florian.hines<AT>gmail.com
+ # Author: William Kelly <the.william.kelly<AT>gmail.com
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA.
+
+Authors:
+    Florian Hines <florian.hines<AT>gmail.com>
+    William Kelly <the.william.kelly<AT>gmail.com>
+'''
+
+
+from swift.common.memcached import MemcacheRing
+from swiftscripts.utils.output import output
+import optparse
+import time
+import socket
+import uuid
+from subprocess import call
+
+
+def main():
+    restart_attempted = False
+    usage = "usage: %prog [-h host] [-p port] [-s|-d] OR "
+    "%prog [-m host1:port,host2:port,...] [-d]"
+
+    p = optparse.OptionParser(usage)
+    p.add_option('--host', '-H', default="127.0.0.1",
+                 help="Default = 127.0.0.1")
+    p.add_option('--port', '-p', default="11211", help="Default = 11211")
+    options, arguments = p.parse_args()
+    result = single_connect(options.host, options.port)
+
+    if not result:
+        if memrestart(options.host):
+            #recheck
+            time.sleep(2)
+            restart_attempted = True
+            result = single_connect(options.host, options.port)
+        else:
+            restart_attempted = True
+            result = False
+
+    if result:
+        if restart_attempted:
+            output("Success: memcached was restarted on %s:%s." %
+                   (options.host, options.port))
+        exit(0)
+    else:
+        output("Error: memcached is down on %s:%s" %
+               (options.host, options.port))
+        exit(2)
+
+
+def single_connect(host, port):
+    server = "%s:%s" % (host, port)
+    try:
+        m = MemcacheRing([server])
+        s_uuid = "healthcheck_%s" % str(uuid.uuid4())
+        m.set(s_uuid, 1)
+        result = m.get(s_uuid)
+        m.delete(s_uuid)
+    except socket.timeout:
+        return False
+    return result == 1
+
+
+def memrestart(server):
+    print "Attempting restart of %s" % server
+    command = "/etc/init.d/memcached"
+    args = "restart"
+    return call([command, args]) == 0
+
+if __name__ == '__main__':
+    main()
