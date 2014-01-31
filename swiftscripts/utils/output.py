@@ -6,5 +6,36 @@
 # sure how subject will work yet.)
 
 
+levels=["info", "error", "debug", "warn", "critical"]
+
+def info(s, **kwargs):
+    kwargs['level'] = 'info'
+    output(s, **kwargs)
+
+
+def debug(s, **kwargs):
+    kwargs['level'] = 'debug'
+    output(s, **kwargs)
+
+
+def error(s, **kwargs):
+    kwargs['level'] = 'error'
+    output(s, **kwargs)
+
+
+def warn(s, **kwargs):
+    kwargs['level'] = 'warn'
+    output(s, **kwargs)
+
+
+def critical(s, **kwargs):
+    kwargs['level'] = 'critical'
+    output(s, **kwargs)
+
+
 def output(s, **kwargs):
-    print s
+    level = kwargs.get('level')
+    if level:
+        print "%s: level" % (level.upper())
+    else:
+        print s
