@@ -3,6 +3,7 @@
 from swift.common.utils import whataremyips
 from swift.common.ring import Ring
 
+
 def whataremyactivelabels(ring_files=None, swift_conf_dir="/etc/swift"):
     """Read ring_files and extract a set of paths that should be on the
 host running this script.

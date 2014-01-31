@@ -5,5 +5,6 @@
 # have a function 'mail' that has some extra config (from, to, not
 # sure how subject will work yet.)
 
+
 def output(s, **kwargs):
     print s
