@@ -1,0 +1,17 @@
+#!/usr/bin/env python
+
+from swiftscripts.utils.output import output
+from swiftscripts.utils.rings import whataremyactivelabels
+from swift.common.constraints import check_mount
+
+labels = whataremyactivelabels()
+
+problems = []
+for label in labels:
+    # TODO: read swift directory from account, container, object accounts
+    if not check_mount("/srv/node", label):
+        problems.append(label)
+
+if len(problems) > 0:
+    output('The following mount points are expected to be mounted but are '
+           "currently umounted: %s" % ", ".join(labels))
