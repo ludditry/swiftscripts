@@ -36,6 +36,6 @@ def critical(s, **kwargs):
 def output(s, **kwargs):
     level = kwargs.get('level')
     if level:
-        print "%s: level" % (level.upper())
+        print "%s: %s" % (level.upper(), s)
     else:
         print s
