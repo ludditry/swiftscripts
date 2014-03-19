@@ -30,7 +30,7 @@ Authors:
 
 
 from swift.common.memcached import MemcacheRing
-from swiftscripts.utils.output import output
+from swiftscripts.utils.output import info, error
 import optparse
 import time
 import socket
@@ -62,11 +62,11 @@ def main():
 
     if result:
         if restart_attempted:
-            output("Success: memcached was restarted on %s:%s." %
+            info("Success: memcached was restarted on %s:%s." %
                    (options.host, options.port))
         exit(0)
     else:
-        output("Error: memcached is down on %s:%s" %
+        error("Error: memcached is down on %s:%s" %
                (options.host, options.port))
         exit(2)
 

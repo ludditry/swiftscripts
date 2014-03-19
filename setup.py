@@ -14,4 +14,5 @@ setup(name='swiftscripts',
       long_description=long_description,
       url="http://github.com/ludditry/swiftscripts",
       packages=['swiftscripts.utils'],
-      scripts=['bin/swiftscripts-drive-check'])
+      scripts=['bin/swiftscripts-drive-check',
+               'bin/swiftscripts-drive-audit'])
